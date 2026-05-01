@@ -121,6 +121,35 @@ def execute_pipeline(row: dict[str, Any], pipeline: list[dict[str, Any]], datase
             key = str(row.get(group_field, ""))
             current = agg.get(key)
 
+        # --- Array ops (row-level) ---
+        elif op == "map":
+            source = step.get("source_field", "")
+            arr = list(row.get(source, current) if source else (current or []))
+            inner = step.get("transformations", [])
+            current = [execute_pipeline({"item": item}, inner, dataset) for item in arr]
+
+        elif op == "filter":
+            source = step.get("source_field", "")
+            arr = list(row.get(source, current) if source else (current or []))
+            field = step.get("field", "")
+            expected = step.get("value")
+            current = [item for item in arr if (item.get(field) if isinstance(item, dict) else item) == expected]
+
+        elif op == "reduce":
+            source = step.get("source_field", "")
+            arr = list(row.get(source, current) if source else (current or []))
+            agg_op = step.get("agg", "sum")
+            if agg_op == "sum":
+                current = sum(float(item) for item in arr)
+            elif agg_op == "count":
+                current = len(arr)
+            elif agg_op == "min":
+                current = min(arr) if arr else None
+            elif agg_op == "max":
+                current = max(arr) if arr else None
+            else:
+                raise ValueError(f"Unknown reduce agg: {agg_op!r}")
+
         else:
             raise ValueError(f"Unknown transformation op: '{op}'")
 

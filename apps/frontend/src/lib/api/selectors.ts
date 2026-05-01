@@ -4,11 +4,11 @@ import type { SelectorOptionsRequest, SelectorEvaluateRequest } from "@docuweave
 export const selectorsApi = {
   getOptions: (payload: SelectorOptionsRequest) =>
     apiClient
-      .post<Record<string, unknown>[]>("/selectors/options", payload)
+      .post<Record<string, unknown>[]>("/api/v1/selectors/options", payload)
       .then((r) => r.data),
 
   evaluate: (payload: SelectorEvaluateRequest) =>
     apiClient
-      .post<Record<string, unknown>[]>("/selectors/evaluate", payload)
+      .post<Record<string, unknown>[]>("/api/v1/selectors/evaluate", payload)
       .then((r) => r.data),
 };

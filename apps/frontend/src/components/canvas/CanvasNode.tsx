@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { Group, Rect, Text, Transformer } from "react-konva";
+import { useRef } from "react";
+import { Group, Rect, Text } from "react-konva";
 import type Konva from "konva";
 import type { TemplateComponent } from "@docuweave/shared-types";
 import { useCanvasStore } from "@/store/canvasStore";
@@ -12,7 +12,6 @@ interface Props {
 
 export function CanvasNode({ component }: Props) {
   const groupRef = useRef<Konva.Group>(null);
-  const transformerRef = useRef<Konva.Transformer>(null);
   const selectedId = useCanvasStore((s) => s.selectedId);
   const selectComponent = useCanvasStore((s) => s.selectComponent);
   const moveComponent = useCanvasStore((s) => s.moveComponent);

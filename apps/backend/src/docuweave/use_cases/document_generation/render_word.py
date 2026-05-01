@@ -7,7 +7,6 @@ import io
 from typing import Any
 
 from docx import Document
-from docx.shared import Pt
 
 from docuweave.domain.entities.template import Template, TemplateComponent
 from docuweave.use_cases.transformations.execute_pipeline import execute_pipeline

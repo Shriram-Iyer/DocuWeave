@@ -1,6 +1,5 @@
 "use client";
 
-import { use } from "react";
 import { useTemplate } from "@/hooks/useTemplates";
 import { CanvasBoard } from "@/components/canvas/CanvasBoard";
 import { SpreadsheetBoard } from "@/components/spreadsheet/SpreadsheetBoard";
@@ -10,11 +9,11 @@ import { DndContext } from "@dnd-kit/core";
 import { useCanvas } from "@/hooks/useCanvas";
 
 interface Props {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }
 
 export default function EditorPage({ params }: Props) {
-  const { id } = use(params);
+  const { id } = params;
   const { data: template, isLoading } = useTemplate(id);
   const { handleDrop } = useCanvas();
 

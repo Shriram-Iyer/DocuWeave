@@ -13,22 +13,22 @@ router = APIRouter(prefix="/api/v1/documents", tags=["documents"])
 
 
 def _build_template(tm: TemplateModel) -> Template:
-    components = [
+    # Sort by sort_order here so renderers receive components in order
+    sorted_components = sorted(tm.components or [], key=lambda c: c.sort_order)
+    components = tuple(
         TemplateComponent(
             id=c.id,
-            template_id=c.template_id,
             type=c.type,
             position=c.position,
             content=c.content,
             source_table=c.source_table,
             source_field=c.source_field,
-            columns=c.columns,
+            columns=tuple(c.columns or []),
             repeat_over=c.repeat_over,
-            transformations=c.transformations,
-            sort_order=c.sort_order,
+            transformations=tuple(c.transformations or []),
         )
-        for c in (tm.components or [])
-    ]
+        for c in sorted_components
+    )
     return Template(
         id=tm.id,
         name=tm.name,

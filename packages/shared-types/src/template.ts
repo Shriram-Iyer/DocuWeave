@@ -3,6 +3,7 @@ import type { TransformationStep } from "./transformation";
 
 export interface TemplateComponent {
   id: string;
+  template_id: string;
   type: ComponentType;
   position: CanvasPosition;
   content?: string;

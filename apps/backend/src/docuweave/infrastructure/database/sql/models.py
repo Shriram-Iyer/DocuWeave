@@ -5,8 +5,7 @@ JSON columns store complex nested structures (pipeline configs, canvas layouts).
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import DateTime, ForeignKey, String, Text
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import DateTime, ForeignKey, JSON, String, Text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -28,7 +27,7 @@ class TemplateModel(Base):
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     output_format: Mapped[str] = mapped_column(String(10), nullable=False)  # docx | xlsx
-    excel_config: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    excel_config: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, onupdate=_utcnow)
 
@@ -43,13 +42,13 @@ class ComponentModel(Base):
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
     template_id: Mapped[str] = mapped_column(ForeignKey("templates.id", ondelete="CASCADE"))
     type: Mapped[str] = mapped_column(String(50), nullable=False)
-    position: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+    position: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
     content: Mapped[str] = mapped_column(Text, default="")
     source_table: Mapped[str] = mapped_column(String(255), default="")
     source_field: Mapped[str] = mapped_column(String(255), default="")
-    columns: Mapped[list] = mapped_column(JSONB, default=list)
+    columns: Mapped[list] = mapped_column(JSON, default=list)
     repeat_over: Mapped[str] = mapped_column(String(255), default="")
-    transformations: Mapped[list] = mapped_column(JSONB, default=list)
+    transformations: Mapped[list] = mapped_column(JSON, default=list)
     sort_order: Mapped[int] = mapped_column(default=0)
 
     template: Mapped[TemplateModel] = relationship(back_populates="components")
@@ -70,5 +69,5 @@ class LinkConfigModel(Base):
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
-    tables: Mapped[list] = mapped_column(JSONB, nullable=False, default=list)
+    tables: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)

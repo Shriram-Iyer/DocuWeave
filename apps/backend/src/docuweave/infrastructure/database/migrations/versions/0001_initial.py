@@ -7,7 +7,6 @@ Create Date: 2026-05-01
 from typing import Sequence, Union
 
 import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
 from alembic import op
 
 revision: str = "0001"
@@ -22,7 +21,7 @@ def upgrade() -> None:
         sa.Column("id", sa.String(36), primary_key=True),
         sa.Column("name", sa.String(255), nullable=False),
         sa.Column("output_format", sa.String(10), nullable=False, server_default="docx"),
-        sa.Column("excel_config", postgresql.JSONB(), nullable=True),
+        sa.Column("excel_config", sa.JSON(), nullable=True),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),
@@ -47,13 +46,13 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.Column("type", sa.String(50), nullable=False),
-        sa.Column("position", postgresql.JSONB(), nullable=False, server_default="{}"),
+        sa.Column("position", sa.JSON(), nullable=False, server_default="{}"),
         sa.Column("content", sa.Text(), nullable=False, server_default=""),
         sa.Column("source_table", sa.String(255), nullable=False, server_default=""),
         sa.Column("source_field", sa.String(255), nullable=False, server_default=""),
-        sa.Column("columns", postgresql.JSONB(), nullable=False, server_default="[]"),
+        sa.Column("columns", sa.JSON(), nullable=False, server_default="[]"),
         sa.Column("repeat_over", sa.String(255), nullable=False, server_default=""),
-        sa.Column("transformations", postgresql.JSONB(), nullable=False, server_default="[]"),
+        sa.Column("transformations", sa.JSON(), nullable=False, server_default="[]"),
         sa.Column("sort_order", sa.Integer(), nullable=False, server_default="0"),
     )
     op.create_index("ix_template_components_template_id", "template_components", ["template_id"])
@@ -76,7 +75,7 @@ def upgrade() -> None:
         "link_configs",
         sa.Column("id", sa.String(36), primary_key=True),
         sa.Column("name", sa.String(255), nullable=False),
-        sa.Column("tables", postgresql.JSONB(), nullable=False, server_default="[]"),
+        sa.Column("tables", sa.JSON(), nullable=False, server_default="[]"),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),

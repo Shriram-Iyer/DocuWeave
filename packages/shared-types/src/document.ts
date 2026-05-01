@@ -2,7 +2,6 @@ export interface GenerateDocumentRequest {
   template_id: string;
   data_source_id: string;
   link_config_id: string;
-  output_format: "docx" | "xlsx";
   selected_ids?: string[];
 }
 
