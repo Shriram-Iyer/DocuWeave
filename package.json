@@ -1,0 +1,19 @@
+{
+  "name": "docuweave",
+  "private": true,
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "test": "turbo test",
+    "lint": "turbo lint",
+    "type-check": "turbo type-check",
+    "format": "turbo format"
+  },
+  "devDependencies": {
+    "turbo": "latest"
+  },
+  "packageManager": "pnpm@latest",
+  "engines": {
+    "node": ">=22"
+  }
+}

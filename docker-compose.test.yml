@@ -1,0 +1,46 @@
+# Isolated test databases — used by integration tests only.
+# Start with: docker compose -f docker-compose.test.yml up -d
+services:
+  test_postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: test_docuweave
+    ports:
+      - "15432:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+  test_mysql:
+    image: mysql:9
+    environment:
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
+      MYSQL_DATABASE: test_docuweave
+      MYSQL_ROOT_PASSWORD: roottest
+    ports:
+      - "13306:3306"
+    tmpfs:
+      - /var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+
+  test_mongo:
+    image: mongo:8
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: test
+      MONGO_INITDB_ROOT_PASSWORD: test
+      MONGO_INITDB_DATABASE: test_docuweave
+    ports:
+      - "27117:27017"
+    tmpfs:
+      - /data/db

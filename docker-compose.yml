@@ -1,0 +1,141 @@
+services:
+  # -------------------------------------------------------------------------
+  # Template Database options (uncomment the one matching TEMPLATE_DB_TYPE)
+  # -------------------------------------------------------------------------
+
+  # PostgreSQL — template DB (default)
+  template_db_postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: docuweave
+      POSTGRES_PASSWORD: docuweave
+      POSTGRES_DB: docuweave_templates
+    ports:
+      - "5432:5432"
+    volumes:
+      - template_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U docuweave"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # MongoDB — template DB (alternative)
+  template_db_mongo:
+    image: mongo:8
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: docuweave
+      MONGO_INITDB_ROOT_PASSWORD: docuweave
+      MONGO_INITDB_DATABASE: docuweave_templates
+    ports:
+      - "27017:27017"
+    volumes:
+      - template_mongo_data:/data/db
+    profiles:
+      - mongo-template
+
+  # -------------------------------------------------------------------------
+  # Data Database options (for local development with sample data)
+  # -------------------------------------------------------------------------
+
+  # PostgreSQL — data DB (example)
+  data_db_postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: docuweave
+      POSTGRES_PASSWORD: docuweave
+      POSTGRES_DB: docuweave_data
+    ports:
+      - "5433:5432"
+    volumes:
+      - data_postgres_data:/var/lib/postgresql/data
+      - ./samples/sql/seed_data.sql:/docker-entrypoint-initdb.d/seed.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U docuweave"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # MySQL — data DB (alternative)
+  data_db_mysql:
+    image: mysql:9
+    environment:
+      MYSQL_USER: docuweave
+      MYSQL_PASSWORD: docuweave
+      MYSQL_DATABASE: docuweave_data
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - data_mysql_data:/var/lib/mysql
+    profiles:
+      - mysql-data
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # MongoDB — data DB (alternative)
+  data_db_mongo:
+    image: mongo:8
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: docuweave
+      MONGO_INITDB_ROOT_PASSWORD: docuweave
+      MONGO_INITDB_DATABASE: docuweave_data
+    ports:
+      - "27018:27017"
+    volumes:
+      - data_mongo_data:/data/db
+    profiles:
+      - mongo-data
+
+  # -------------------------------------------------------------------------
+  # Backend
+  # -------------------------------------------------------------------------
+  backend:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      template_db_postgres:
+        condition: service_healthy
+    volumes:
+      - ./apps/backend/src:/app/src
+      - generated_docs:/app/generated_docs
+    develop:
+      watch:
+        - action: sync
+          path: ./apps/backend/src
+          target: /app/src
+
+  # -------------------------------------------------------------------------
+  # Frontend
+  # -------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./apps/frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:8000
+    depends_on:
+      - backend
+    develop:
+      watch:
+        - action: sync
+          path: ./apps/frontend/src
+          target: /app/src
+
+volumes:
+  template_postgres_data:
+  template_mongo_data:
+  data_postgres_data:
+  data_mysql_data:
+  data_mongo_data:
+  generated_docs:
